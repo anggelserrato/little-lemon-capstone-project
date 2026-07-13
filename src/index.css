@@ -1,1 +1,159 @@
 @import 'tailwindcss';
+
+@font-face {
+  font-display: swap;
+  font-family: 'Karla';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./fonts/karla-v33-latin-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Karla';
+  font-style: normal;
+  font-weight: 500;
+  src: url('./fonts/karla-v33-latin-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Karla';
+  font-style: normal;
+  font-weight: 600;
+  src: url('./fonts/karla-v33-latin-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Karla';
+  font-style: normal;
+  font-weight: 700;
+  src: url('./fonts/karla-v33-latin-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Markazi Text';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./fonts/markazi-text-v28-latin-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Markazi Text';
+  font-style: normal;
+  font-weight: 500;
+  src: url('./fonts/markazi-text-v28-latin-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Markazi Text';
+  font-style: normal;
+  font-weight: 600;
+  src: url('./fonts/markazi-text-v28-latin-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Markazi Text';
+  font-style: normal;
+  font-weight: 700;
+  src: url('./fonts/markazi-text-v28-latin-700.woff2') format('woff2');
+}
+
+@theme {
+  --color-white: hsl(0 100% 100%);
+  --color-forest: hsl(158 12% 34%);
+  --color-lemon: hsl(49 91% 52%);
+  --color-salmon: hsl(19 79% 69%);
+  --color-peach: hsl(29 88% 86%);
+  --color-mist: hsl(135 5% 93%);
+  --color-charcoal: hsl(0 0% 20%);
+  --font-sans: 'Karla', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Markazi Text', ui-sans-serif, system-ui, sans-serif;
+  --spacing-card-100: 0.5rem; /* 8px */
+  --spacing-card-200: 1rem; /* 16px */
+  --spacing-card-300: 1.5rem; /* 24px */
+  --spacing-card-400: 2rem; /* 32px */
+  --spacing-card-500: 2.5rem; /* 40px */
+  --spacing-card-600: 3rem; /* 48px */
+}
+
+@layer base {
+  html {
+    @apply antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    background-color: var(--color-white);
+  }
+}
+
+@utility text-preset-1 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 4rem; /* 64px */
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+@utility text-preset-2 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 2.5rem; /* 40px */
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+@utility text-preset-3 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+@utility text-preset-4 {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 1.25rem; /* 20px */
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+@utility text-preset-5 {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 1rem; /* 16px */
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+@utility text-preset-6 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+@utility text-preset-7 {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 1rem; /* 16px */
+  line-height: 1.5;
+  letter-spacing: 0;
+  max-width: 65ch;
+}
+
+@utility text-preset-8 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 1rem; /* 16px */
+  line-height: 1.5;
+  letter-spacing: 0;
+}
