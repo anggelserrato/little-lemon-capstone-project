@@ -1,20 +1,7 @@
 import { useState } from 'react';
+// import { fetchAPI, submitAPI } from '../api.js ';
 
-const TIMES = [
-  '17:00',
-  '17:30',
-  '18:00',
-  '18:30',
-  '19:00',
-  '19:30',
-  '20:00',
-  '20:30',
-  '21:00',
-  '21:30',
-  '22:00',
-];
-
-const OCCASIONS = ['Birthday', 'Anniversary', 'Business', 'Other'];
+const OCCASIONS = ['Birthday', 'Engagement', 'Anniversary'];
 
 const INITIAL_STATE = {
   date: '',
@@ -32,17 +19,33 @@ const INITIAL_STATE = {
 export default function BookingPage() {
   const [form, setForm] = useState(INITIAL_STATE);
   const [submitted, setSubmitted] = useState(false);
+  const [availableTimes, setAvailableTimes] = useState(fetchAPI(new Date()));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === 'date' ? { time: '' } : {}),
+    }));
+
+    if (name === 'date') {
+      setAvailableTimes(fetchAPI(new Date(value)));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: connect to your booking API / submitAPI(form)
-    console.log('Booking submitted:', form);
-    setSubmitted(true);
+
+    const success = submitAPI(form);
+
+    if (success) {
+      console.log('Booking submitted:', form);
+      setSubmitted(true);
+    } else {
+      alert('Unable to complete your reservation.');
+    }
   };
 
   if (submitted) {
@@ -58,6 +61,7 @@ export default function BookingPage() {
           type="button"
           onClick={() => {
             setForm(INITIAL_STATE);
+            setAvailableTimes(fetchAPI(new Date()));
             setSubmitted(false);
           }}
         >
@@ -126,7 +130,7 @@ export default function BookingPage() {
                 <option value="" disabled>
                   Select a time
                 </option>
-                {TIMES.map((t) => (
+                {availableTimes.map((t) => (
                   <option key={t} value={t}>
                     {t}
                   </option>

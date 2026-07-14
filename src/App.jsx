@@ -3,6 +3,7 @@ import Nav from './components/Nav';
 import Footer from './components/Footer';
 import HomePage from './pages/Homepage';
 import BookingPage from './pages/BookingPage';
+import ConfirmedBookingPage from './pages/ConfirmedBookingPage';
 import MenuPage from './pages/MenuPage';
 import AboutPage from './pages/AboutPage';
 import OrderOnlinePage from './pages/OrderOnlinePage';
@@ -16,6 +17,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/reservations" element={<BookingPage />} />
+        <Route path="/confirmed" element={<ConfirmedBookingPage />} />
         <Route path="/menu" element={<MenuPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/order-online" element={<OrderOnlinePage />} />
