@@ -1,5 +1,9 @@
 import { useState } from 'react';
-// import { fetchAPI, submitAPI } from '../api.js ';
+import {
+  fetchAvailableTimes,
+  submitBooking,
+  validateBookingForm,
+} from '../services/bookingService';
 
 const OCCASIONS = ['Birthday', 'Engagement', 'Anniversary'];
 
@@ -20,11 +24,115 @@ const inputClass =
   'bg-white border border-mist rounded-lg px-card-200 py-card-100 text-preset-7 text-charcoal focus:outline-none focus:ring-2 focus:ring-lemon w-full';
 const labelClass = 'text-preset-8 text-charcoal block mb-card-100';
 const fieldClass = 'flex flex-col';
+const errorClass = 'mt-card-100 text-preset-8 text-red-600';
+
+function Field({
+  form,
+  errors,
+  onChange,
+  name,
+  label,
+  type = 'text',
+  required = false,
+  options = [],
+  hint,
+  ...props
+}) {
+  const describedBy = [props['aria-describedby'], hint ? `${name}-hint` : null]
+    .filter(Boolean)
+    .join(' ');
+
+  const commonProps = {
+    ...props,
+    id: name,
+    name,
+    value: form[name],
+    onChange,
+    className: props.className ?? inputClass,
+    required,
+    'aria-required': required || undefined,
+    'aria-describedby': describedBy || undefined,
+  };
+
+  const control =
+    type === 'select' ? (
+      <select {...commonProps}>
+        {options.map((option) => (
+          <option
+            key={option.value}
+            value={option.value}
+            disabled={option.disabled}
+          >
+            {option.label}
+          </option>
+        ))}
+      </select>
+    ) : type === 'textarea' ? (
+      <textarea {...commonProps} rows={props.rows ?? 4} />
+    ) : (
+      <input {...commonProps} type={type} />
+    );
+
+  return (
+    <div className={fieldClass}>
+      <label htmlFor={name} className={labelClass}>
+        {label}{' '}
+        {required ? (
+          <abbr title="required" aria-hidden="true">
+            *
+          </abbr>
+        ) : null}
+      </label>
+      {control}
+      {hint ? (
+        <span id={`${name}-hint`} className="sr-only">
+          {hint}
+        </span>
+      ) : null}
+      {errors[name] ? <p className={errorClass}>{errors[name]}</p> : null}
+    </div>
+  );
+}
+
+function RadioGroup({ form, onChange, legend, name, options }) {
+  return (
+    <fieldset className="flex flex-col gap-card-100">
+      <legend className="mb-card-100 text-preset-8 text-charcoal">
+        {legend}
+      </legend>
+      <div className="flex gap-card-300">
+        {options.map((option) => (
+          <label
+            key={option.value}
+            className="flex text-preset-7 cursor-pointer items-center gap-card-100 text-charcoal"
+          >
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={form[name] === option.value}
+              onChange={onChange}
+              className="accent-lemon"
+            />
+            {option.label}
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
 
 export default function BookingPage() {
   const [form, setForm] = useState(INITIAL_STATE);
   const [submitted, setSubmitted] = useState(false);
-  const [availableTimes, setAvailableTimes] = useState(fetchAPI(new Date()));
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState('');
+  const [availableTimes, setAvailableTimes] = useState(() =>
+    fetchAvailableTimes(new Date())
+  );
+
+  const today = new Date().toISOString().split('T')[0];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,21 +143,46 @@ export default function BookingPage() {
       ...(name === 'date' ? { time: '' } : {}),
     }));
 
+    setErrors((prev) => {
+      if (!prev[name]) {
+        return prev;
+      }
+
+      const nextErrors = { ...prev };
+      delete nextErrors[name];
+      return nextErrors;
+    });
+
     if (name === 'date') {
-      setAvailableTimes(fetchAPI(new Date(value)));
+      setAvailableTimes(fetchAvailableTimes(new Date(value || new Date())));
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitMessage('');
 
-    const success = submitAPI(form);
+    const nextErrors = validateBookingForm(form);
+    setErrors(nextErrors);
 
-    if (success) {
-      console.log('Booking submitted:', form);
-      setSubmitted(true);
-    } else {
-      alert('Unable to complete your reservation.');
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const result = await submitBooking(form);
+
+      if (result?.success) {
+        setSubmitted(true);
+      } else {
+        setSubmitMessage('Unable to complete your reservation right now.');
+      }
+    } catch {
+      setSubmitMessage('Something went wrong while saving your reservation.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -73,8 +206,10 @@ export default function BookingPage() {
             type="button"
             onClick={() => {
               setForm(INITIAL_STATE);
-              setAvailableTimes(fetchAPI(new Date()));
+              setAvailableTimes(fetchAvailableTimes(new Date()));
               setSubmitted(false);
+              setErrors({});
+              setSubmitMessage('');
             }}
             className="w-full cursor-pointer rounded-xl bg-lemon py-card-300 text-preset-6 text-charcoal transition-colors duration-200 hover:bg-peach focus-visible:ring-2 focus-visible:ring-lemon focus-visible:outline-none"
           >
@@ -108,254 +243,161 @@ export default function BookingPage() {
           noValidate
           className="flex flex-col gap-card-400"
         >
-          {/* ── Date & Time ── */}
           <fieldset className="flex flex-col gap-card-300 rounded-xl border border-mist p-card-300">
             <legend className="px-card-100 text-preset-4 text-charcoal">
               When would you like to visit?
             </legend>
 
-            <div className={fieldClass}>
-              <label htmlFor="date" className={labelClass}>
-                Date{' '}
-                <abbr title="required" aria-hidden="true">
-                  *
-                </abbr>
-              </label>
-              <input
-                type="date"
-                id="date"
-                name="date"
-                value={form.date}
-                onChange={handleChange}
-                min={new Date().toISOString().split('T')[0]}
-                required
-                aria-required="true"
-                aria-describedby="date-hint"
-                className={inputClass}
-              />
-              <span id="date-hint" className="sr-only">
-                Select a date for your reservation. Must be today or later.
-              </span>
-            </div>
+            <Field
+              form={form}
+              errors={errors}
+              onChange={handleChange}
+              name="date"
+              label="Date"
+              type="date"
+              required
+              min={today}
+              hint="Select a date for your reservation. Must be today or later."
+            />
 
-            <div className={fieldClass}>
-              <label htmlFor="time" className={labelClass}>
-                Time{' '}
-                <abbr title="required" aria-hidden="true">
-                  *
-                </abbr>
-              </label>
-              <select
-                id="time"
-                name="time"
-                value={form.time}
-                onChange={handleChange}
-                required
-                aria-required="true"
-                className={inputClass}
-              >
-                <option value="" disabled>
-                  Select a time
-                </option>
-                {availableTimes.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Field
+              form={form}
+              errors={errors}
+              onChange={handleChange}
+              name="time"
+              label="Time"
+              type="select"
+              required
+              options={[
+                { label: 'Select a time', value: '', disabled: true },
+                ...availableTimes.map((slot) => ({ label: slot, value: slot })),
+              ]}
+            />
           </fieldset>
 
-          {/* ── Party Details ── */}
           <fieldset className="flex flex-col gap-card-300 rounded-xl border border-mist p-card-300">
             <legend className="px-card-100 text-preset-4 text-charcoal">
               Party details
             </legend>
 
-            <div className={fieldClass}>
-              <label htmlFor="guests" className={labelClass}>
-                Number of Guests{' '}
-                <abbr title="required" aria-hidden="true">
-                  *
-                </abbr>
-              </label>
-              <input
-                type="number"
-                id="guests"
-                name="guests"
-                value={form.guests}
-                onChange={handleChange}
-                min={1}
-                max={10}
-                required
-                aria-required="true"
-                aria-describedby="guests-hint"
-                className={inputClass}
-              />
-              <span id="guests-hint" className="sr-only">
-                Enter a number between 1 and 10.
-              </span>
-            </div>
+            <Field
+              form={form}
+              errors={errors}
+              onChange={handleChange}
+              name="guests"
+              label="Number of Guests"
+              type="number"
+              required
+              min={1}
+              max={10}
+              hint="Enter a number between 1 and 10."
+            />
 
-            <div className={fieldClass}>
-              <label htmlFor="occasion" className={labelClass}>
-                Occasion
-              </label>
-              <select
-                id="occasion"
-                name="occasion"
-                value={form.occasion}
-                onChange={handleChange}
-                className={inputClass}
-              >
-                <option value="">Select an occasion (optional)</option>
-                {OCCASIONS.map((o) => (
-                  <option key={o} value={o}>
-                    {o}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Field
+              form={form}
+              errors={errors}
+              onChange={handleChange}
+              name="occasion"
+              label="Occasion"
+              type="select"
+              options={[
+                {
+                  label: 'Select an occasion (optional)',
+                  value: '',
+                  disabled: true,
+                },
+                ...OCCASIONS.map((option) => ({
+                  label: option,
+                  value: option,
+                })),
+              ]}
+            />
 
-            {/* Seating preference as radio group */}
-            <fieldset className="flex flex-col gap-card-100">
-              <legend className="mb-card-100 text-preset-8 text-charcoal">
-                Seating preference
-              </legend>
-              <div className="flex gap-card-300">
-                {['indoor', 'outdoor'].map((option) => (
-                  <label
-                    key={option}
-                    className="flex text-preset-7 cursor-pointer items-center gap-card-100 text-charcoal"
-                  >
-                    <input
-                      type="radio"
-                      name="seating"
-                      value={option}
-                      checked={form.seating === option}
-                      onChange={handleChange}
-                      className="accent-lemon"
-                    />
-                    {option.charAt(0).toUpperCase() + option.slice(1)}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
+            <RadioGroup
+              form={form}
+              onChange={handleChange}
+              legend="Seating preference"
+              name="seating"
+              options={[
+                { label: 'Indoor', value: 'indoor' },
+                { label: 'Outdoor', value: 'outdoor' },
+              ]}
+            />
           </fieldset>
 
-          {/* ── Contact Information ── */}
           <fieldset className="flex flex-col gap-card-300 rounded-xl border border-mist p-card-300">
             <legend className="px-card-100 text-preset-4 text-charcoal">
               Your contact information
             </legend>
 
             <div className="grid grid-cols-1 gap-card-300 sm:grid-cols-2">
-              <div className={fieldClass}>
-                <label htmlFor="firstName" className={labelClass}>
-                  First Name{' '}
-                  <abbr title="required" aria-hidden="true">
-                    *
-                  </abbr>
-                </label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={form.firstName}
-                  onChange={handleChange}
-                  autoComplete="given-name"
-                  required
-                  aria-required="true"
-                  className={inputClass}
-                />
-              </div>
-
-              <div className={fieldClass}>
-                <label htmlFor="lastName" className={labelClass}>
-                  Last Name{' '}
-                  <abbr title="required" aria-hidden="true">
-                    *
-                  </abbr>
-                </label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={form.lastName}
-                  onChange={handleChange}
-                  autoComplete="family-name"
-                  required
-                  aria-required="true"
-                  className={inputClass}
-                />
-              </div>
-            </div>
-
-            <div className={fieldClass}>
-              <label htmlFor="email" className={labelClass}>
-                Email{' '}
-                <abbr title="required" aria-hidden="true">
-                  *
-                </abbr>
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={form.email}
+              <Field
+                form={form}
+                errors={errors}
                 onChange={handleChange}
-                autoComplete="email"
+                name="firstName"
+                label="First Name"
                 required
-                aria-required="true"
-                className={inputClass}
+                autoComplete="given-name"
+              />
+              <Field
+                form={form}
+                errors={errors}
+                onChange={handleChange}
+                name="lastName"
+                label="Last Name"
+                required
+                autoComplete="family-name"
               />
             </div>
 
-            <div className={fieldClass}>
-              <label htmlFor="phone" className={labelClass}>
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={form.phone}
-                onChange={handleChange}
-                autoComplete="tel"
-                aria-describedby="phone-hint"
-                className={inputClass}
-              />
-              <span id="phone-hint" className="sr-only">
-                Optional. Include country code if outside the US.
-              </span>
-            </div>
+            <Field
+              form={form}
+              errors={errors}
+              onChange={handleChange}
+              name="email"
+              label="Email"
+              type="email"
+              required
+              autoComplete="email"
+            />
+
+            <Field
+              form={form}
+              errors={errors}
+              onChange={handleChange}
+              name="phone"
+              label="Phone Number"
+              type="tel"
+              autoComplete="tel"
+              hint="Optional. Include country code if outside the US."
+            />
           </fieldset>
 
-          {/* ── Special Requests ── */}
-          <div className={fieldClass}>
-            <label htmlFor="specialRequests" className={labelClass}>
-              Special Requests
-            </label>
-            <textarea
-              id="specialRequests"
-              name="specialRequests"
-              value={form.specialRequests}
-              onChange={handleChange}
-              rows={4}
-              placeholder="Allergies, dietary requirements, high chair needed…"
-              aria-describedby="requests-hint"
-              className={`${inputClass} resize-none`}
-            />
-            <span id="requests-hint" className="sr-only">
-              Optional. Let us know about allergies or any special needs.
-            </span>
-          </div>
+          <Field
+            form={form}
+            errors={errors}
+            onChange={handleChange}
+            name="specialRequests"
+            label="Special Requests"
+            type="textarea"
+            hint="Optional. Let us know about allergies or any special needs."
+            placeholder="Allergies, dietary requirements, high chair needed…"
+            className={`${inputClass} resize-none`}
+          />
+
+          {submitMessage ? (
+            <p className="rounded-lg border border-peach bg-peach/20 px-card-200 py-card-100 text-preset-8 text-charcoal">
+              {submitMessage}
+            </p>
+          ) : null}
 
           <button
             type="submit"
-            className="w-full cursor-pointer rounded-xl bg-lemon py-card-300 text-preset-6 text-charcoal transition-colors duration-200 hover:bg-peach focus-visible:ring-2 focus-visible:ring-lemon focus-visible:outline-none"
+            disabled={isSubmitting}
+            className="w-full cursor-pointer rounded-xl bg-lemon py-card-300 text-preset-6 text-charcoal transition-colors duration-200 hover:bg-peach focus-visible:ring-2 focus-visible:ring-lemon focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-70"
           >
-            Confirm Reservation
+            {isSubmitting ? 'Submitting...' : 'Confirm Reservation'}
           </button>
         </form>
       </section>
