@@ -122,7 +122,6 @@
   font-size: 1.25rem; /* 20px */
   line-height: 1.2;
   letter-spacing: 0.02em;
-  text-transform: uppercase;
 }
 
 @utility text-preset-5 {
