@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import iconDish from '../assets/icon-dish.svg';
 
 const SPECIALS = [
   {
@@ -58,9 +59,9 @@ function SpecialCard({ name, price, description, image, imageAlt }) {
         <Link
           to="/order-online"
           aria-label={`Order ${name} for delivery`}
-          className="mt-card-100 text-preset-8 text-charcoal underline-offset-2 transition-colors duration-200 hover:text-forest"
+          className="mt-card-100 flex flex-row gap-2 text-preset-8 text-charcoal underline-offset-2 transition-colors duration-200 hover:text-forest"
         >
-          Order a delivery &#x1F6B2;
+          Order a delivery <img src={iconDish} alt="" className="h-5 w-5" />
         </Link>
       </div>
     </article>

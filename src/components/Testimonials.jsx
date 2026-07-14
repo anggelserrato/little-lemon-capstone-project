@@ -1,10 +1,14 @@
-// FIXME: Verify review information for each one
+import john from '../assets/image-john.jpg';
+import sarah from '../assets/image-sarah.jpg';
+import carlos from '../assets/image-carlos.jpg';
+import emily from '../assets/image-emily.jpg';
+
 const TESTIMONIALS = [
   {
     id: 1,
     rating: 5,
     name: 'John D.',
-    photo: '/src/assets/image-john.jpg',
+    photo: john,
     review:
       'Absolutely incredible food and service. The Greek salad was fresh and full of flavour. Will definitely be coming back!',
   },
@@ -12,7 +16,7 @@ const TESTIMONIALS = [
     id: 2,
     rating: 4,
     name: 'Sarah M.',
-    photo: '/src/assets/image-sarah.jpg',
+    photo: sarah,
     review:
       'Lovely atmosphere and authentic Mediterranean cuisine. The lemon dessert was outstanding. Highly recommend!',
   },
@@ -20,7 +24,7 @@ const TESTIMONIALS = [
     id: 3,
     rating: 5,
     name: 'Carlos R.',
-    photo: '/src/assets/image-carlos.jpg',
+    photo: carlos,
     review:
       'Best bruschetta I have ever had outside of Italy. The staff was friendly and welcoming. A true gem in Chicago.',
   },
@@ -28,7 +32,7 @@ const TESTIMONIALS = [
     id: 4,
     rating: 4,
     name: 'Emily T.',
-    photo: '/src/assets/image-emily.jpg',
+    photo: emily,
     review:
       'Wonderful dining experience. The food is fresh, the portions are generous, and the prices are very reasonable.',
   },

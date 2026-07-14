@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router';
+import logo from '../assets/yellow-logo.png';
 
 const NAV_LINKS = [
   { to: '/', label: 'Home' },
@@ -17,18 +18,14 @@ export default function Nav() {
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <header role="banner" className="bg-forest">
+    <header role="banner" className="mx-auto max-w-6xl justify-center bg-white">
       <nav
         aria-label="Main navigation"
         className="flex items-center justify-between px-card-400 py-card-200"
       >
-        <Link
-          to="/"
-          aria-label="Little Lemon — go to homepage"
-          className="text-preset-1 leading-none text-lemon"
-        >
+        <Link to="/" aria-label="Little Lemon — go to homepage">
           <img
-            src="/src/assets/logo.svg"
+            src={logo}
             alt="Little Lemon Restaurant logo"
             width={120}
             height={40}
@@ -44,7 +41,7 @@ export default function Nav() {
           aria-expanded={isMenuOpen}
           aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
           onClick={toggleMenu}
-          className="cursor-pointer rounded p-1 text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-lemon focus-visible:outline-none md:hidden"
+          className="cursor-pointer rounded p-1 text-forest transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-lemon focus-visible:outline-none md:hidden"
         >
           <span aria-hidden="true" className="text-2xl leading-none">
             {isMenuOpen ? '✕' : '☰'}
@@ -63,10 +60,13 @@ export default function Nav() {
               <NavLink
                 to={to}
                 onClick={closeMenu}
-                aria-current={({ isActive }) => (isActive ? 'page' : undefined)}
                 className={({ isActive }) =>
                   `cursor-pointer rounded text-preset-4 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-lemon focus-visible:outline-none ${
-                    isActive ? 'text-lemon' : 'text-white hover:text-lemon'
+                    isActive
+                      ? 'text-lemon'
+                      : isMenuOpen
+                        ? 'text-white hover:text-lemon'
+                        : 'text-forest hover:text-lemon'
                   }`
                 }
               >

@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import bigLogo from '../assets/big-yellow-logo.png';
 
 const DOORMAT_LINKS = [
   { to: '/', label: 'Home' },
@@ -29,31 +30,33 @@ const SOCIAL_LINKS = [
 
 export default function Footer() {
   return (
-    <footer role="contentinfo" className="bg-charcoal">
+    <footer role="contentinfo" className="bg-white">
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-card-400 px-card-400 py-card-600 sm:grid-cols-2 lg:grid-cols-4">
         {/* Logo */}
         <div>
           <Link to="/" aria-label="Little Lemon — back to homepage">
             <img
-              src="/src/assets/logo.svg"
+              src={bigLogo}
               alt="Little Lemon Restaurant logo"
               width={120}
               height={40}
               loading="lazy"
-              className="h-10 w-auto"
+              className="h-50 w-auto"
             />
           </Link>
         </div>
 
         {/* Doormat navigation */}
         <nav aria-label="Footer navigation">
-          <h2 className="mb-card-200 text-preset-4 text-white">Navigation</h2>
+          <h2 className="mb-card-200 text-preset-4 text-charcoal">
+            Navigation
+          </h2>
           <ul role="list" className="flex flex-col gap-card-100">
             {DOORMAT_LINKS.map(({ to, label }) => (
               <li key={to}>
                 <Link
                   to={to}
-                  className="rounded text-preset-8 text-white transition-colors duration-200 hover:text-lemon focus-visible:ring-2 focus-visible:ring-lemon focus-visible:outline-none"
+                  className="rounded text-preset-8 text-charcoal transition-colors duration-200 hover:text-lemon focus-visible:ring-2 focus-visible:ring-lemon focus-visible:outline-none"
                 >
                   {label}
                 </Link>
@@ -64,14 +67,14 @@ export default function Footer() {
 
         {/* Contact */}
         <address>
-          <h2 className="mb-card-200 text-preset-4 text-white not-italic">
+          <h2 className="mb-card-200 text-preset-4 text-charcoal not-italic">
             Contact
           </h2>
           <ul role="list" className="flex flex-col gap-card-100">
             <li>
               <span
                 aria-label="Address"
-                className="text-preset-7 text-white not-italic"
+                className="text-preset-7 text-charcoal not-italic"
               >
                 1234 Mockingbird Lane
               </span>
@@ -80,7 +83,7 @@ export default function Footer() {
               <a
                 href="tel:+13125550199"
                 aria-label="Call us: (312) 555-0199"
-                className="text-preset-7 rounded text-white transition-colors duration-200 hover:text-lemon focus-visible:ring-2 focus-visible:ring-lemon focus-visible:outline-none"
+                className="text-preset-7 rounded text-charcoal transition-colors duration-200 hover:text-lemon focus-visible:ring-2 focus-visible:ring-lemon focus-visible:outline-none"
               >
                 555-0199
               </a>
@@ -89,9 +92,9 @@ export default function Footer() {
               <a
                 href="mailto:hello@littlelemon.com"
                 aria-label="Email us at hello@littlelemon.com"
-                className="text-preset-7 rounded text-white transition-colors duration-200 hover:text-lemon focus-visible:ring-2 focus-visible:ring-lemon focus-visible:outline-none"
+                className="text-preset-7 rounded text-charcoal transition-colors duration-200 hover:text-lemon focus-visible:ring-2 focus-visible:ring-lemon focus-visible:outline-none"
               >
-                info@littlelemon.com
+                contact@littlelemon.com
               </a>
             </li>
           </ul>
@@ -99,7 +102,7 @@ export default function Footer() {
 
         {/* Social media */}
         <div>
-          <h2 className="mb-card-200 text-preset-4 text-white">
+          <h2 className="mb-card-200 text-preset-4 text-charcoal">
             Social Media Links
           </h2>
           <ul
@@ -114,7 +117,7 @@ export default function Footer() {
                   aria-label={label}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-preset-7 rounded text-white transition-colors duration-200 hover:text-lemon focus-visible:ring-2 focus-visible:ring-lemon focus-visible:outline-none"
+                  className="text-preset-7 rounded text-charcoal transition-colors duration-200 hover:text-lemon focus-visible:ring-2 focus-visible:ring-lemon focus-visible:outline-none"
                 >
                   <span aria-hidden="true">{icon}</span>
                 </a>
@@ -125,8 +128,8 @@ export default function Footer() {
       </div>
 
       {/* Copyright bar */}
-      <div className="border-t border-white/10">
-        <small className="block text-preset-7 px-card-400 py-card-200 text-center text-white/60">
+      <div className="border-t border-charcoal/10">
+        <small className="mx-auto block text-preset-7 max-w-6xl px-card-400 py-card-200 text-center text-charcoal/60">
           <p>
             &copy; {new Date().getFullYear()} Little Lemon Restaurant. All
             rights reserved.
